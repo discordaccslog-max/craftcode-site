@@ -1,0 +1,12 @@
+# Paid product files must never be committed to this public repository.
+*.zip
+*.pdf
+CraftCode Products/
+craftcode-products/
+
+# OS / editor clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
