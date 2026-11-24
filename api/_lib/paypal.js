@@ -7,9 +7,10 @@ const API = {
   sandbox: "https://api-m.sandbox.paypal.com",
 };
 
-// Trim so a stray space or line break pasted into Vercel doesn't break auth.
-const clientId = () => (process.env.PAYPAL_CLIENT_ID || "").trim();
-const clientSecret = () => (process.env.PAYPAL_CLIENT_SECRET || "").trim();
+// Clean up pasted values: stray spaces, line breaks, or wrapping quotes.
+const clean = (v) => (v || "").trim().replace(/^["'`]+|["'`]+$/g, "").trim();
+const clientId = () => clean(process.env.PAYPAL_CLIENT_ID);
+const clientSecret = () => clean(process.env.PAYPAL_CLIENT_SECRET);
 
 export function isConfigured() {
   return Boolean(clientId() && clientSecret());
