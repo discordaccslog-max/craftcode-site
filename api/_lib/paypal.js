@@ -7,22 +7,40 @@ const API = {
   sandbox: "https://api-m.sandbox.paypal.com",
 };
 
+// Trim so a stray space or line break pasted into Vercel doesn't break auth.
+const clientId = () => (process.env.PAYPAL_CLIENT_ID || "").trim();
+const clientSecret = () => (process.env.PAYPAL_CLIENT_SECRET || "").trim();
+
 export function isConfigured() {
-  return Boolean(process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET);
+  return Boolean(clientId() && clientSecret());
+}
+
+export function publicClientId() {
+  return clientId();
+}
+
+function mode() {
+  return (process.env.PAYPAL_ENV || "live").trim().toLowerCase() === "sandbox" ? "sandbox" : "live";
 }
 
 function apiBase() {
-  return (process.env.PAYPAL_ENV || "live").toLowerCase() === "sandbox" ? API.sandbox : API.live;
+  return API[mode()];
 }
 
 async function accessToken() {
-  const auth = Buffer.from(`${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`).toString("base64");
+  const auth = Buffer.from(`${clientId()}:${clientSecret()}`).toString("base64");
   const res = await fetch(`${apiBase()}/v1/oauth2/token`, {
     method: "POST",
     headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
     body: "grant_type=client_credentials",
   });
-  if (!res.ok) throw new Error(`PayPal authentication failed (HTTP ${res.status})`);
+  if (!res.ok) {
+    const detail = await res.json().catch(() => ({}));
+    // Log lengths and PayPal's error code only, never the credentials.
+    console.error(`PayPal auth failed: HTTP ${res.status} ${detail.error || ""} ${detail.error_description || ""} ` +
+      `(mode=${mode()}, clientIdLength=${clientId().length}, secretLength=${clientSecret().length})`);
+    throw new Error(`PayPal authentication failed (HTTP ${res.status})`);
+  }
   return (await res.json()).access_token;
 }
 
