@@ -38,8 +38,11 @@ async function accessToken() {
   if (!res.ok) {
     const detail = await res.json().catch(() => ({}));
     // Log lengths and PayPal's error code only, never the credentials.
+    // Positions and codes of characters that never appear in PayPal keys.
+    const odd = (v) => [...v].map((c, i) => (/[A-Za-z0-9_-]/.test(c) ? null : `${i}:U+${c.codePointAt(0).toString(16).toUpperCase().padStart(4, "0")}`)).filter(Boolean).join(",") || "none";
     console.error(`PayPal auth failed: HTTP ${res.status} ${detail.error || ""} ${detail.error_description || ""} ` +
-      `(mode=${mode()}, clientIdLength=${clientId().length}, secretLength=${clientSecret().length})`);
+      `(mode=${mode()}, clientIdLength=${clientId().length}, secretLength=${clientSecret().length}, ` +
+      `clientIdOddChars=${odd(clientId())}, secretOddChars=${odd(clientSecret())})`);
     throw new Error(`PayPal authentication failed (HTTP ${res.status})`);
   }
   return (await res.json()).access_token;
