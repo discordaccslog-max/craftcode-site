@@ -244,6 +244,14 @@ strong { font-weight: 650; }
 .product--featured { border: 2px solid var(--accent); }
 .ribbon { font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--accent); }
 .checkout-note { font-size: 13px; color: var(--muted); text-align: center; }
+.paypal-checkout { display: grid; gap: 10px; width: 100%; max-width: 420px; }
+.consent { display: flex; gap: 8px; align-items: flex-start; font-size: 13px; line-height: 1.45; color: var(--muted); cursor: pointer; }
+.consent input { width: 17px; height: 17px; margin: 1px 0 0; flex: none; accent-color: var(--accent); }
+.paypal-buttons { min-height: 48px; position: relative; z-index: 0; }
+.paypal-status { font-size: 13.5px; color: var(--warn); min-height: 0; }
+.paypal-status:empty { display: none; }
+.pp-buy .paypal-checkout { flex: 1 1 280px; }
+.download-box { margin: 22px 0 26px; }
 .pricing-foot { margin-top: 22px; font-size: 14.5px; color: var(--muted); }
 
 /* ---------- how it works ---------- */
